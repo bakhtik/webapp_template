@@ -12,6 +12,7 @@ type User struct {
 	Name      string
 	Email     string
 	Password  string
+	Role      string
 	CreatedAt time.Time
 }
 
@@ -50,8 +51,8 @@ func (s *Session) Check() (err error) {
 // User gets the user from the session
 func (s *Session) User() (user User, err error) {
 	user = User{}
-	err = Db.QueryRow("SELECT id, name, email, created_at FROM users WHERE id = $1", s.UserId).
-		Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt)
+	err = Db.QueryRow("SELECT id, name, email, role, created_at FROM users WHERE id = $1", s.UserId).
+		Scan(&user.Id, &user.Name, &user.Email, &user.Role, &user.CreatedAt)
 	return
 }
 
@@ -87,7 +88,7 @@ func (u *User) Create() (err error) {
 	// Postgres does not automatically return the last insert id, because it would be wrong to assume
 	// you're always using a sequence.You need to use the RETURNING keyword in your insert to get this
 	// information from postgres.
-	statement := "INSERT INTO users (name, email, password, created_at) values ($1, $2, $3, $4) RETURNING id, created_at"
+	statement := "INSERT INTO users (name, email, password, role, created_at) values ($1, $2, $3, $4, $5) RETURNING id, created_at"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		return
@@ -100,7 +101,7 @@ func (u *User) Create() (err error) {
 		return
 	}
 	// use QueryRow to return a row and scan the returned id into the User struct
-	err = stmt.QueryRow(u.Name, u.Email, string(bs), time.Now()).
+	err = stmt.QueryRow(u.Name, u.Email, string(bs), u.Role, time.Now()).
 		Scan(&u.Id, &u.CreatedAt)
 	return
 }
@@ -120,14 +121,14 @@ func (u *User) Delete() (err error) {
 
 // Update user information in the database
 func (u *User) Update() (err error) {
-	statement := "update users set name = $2, email = $3 where id = $1"
+	statement := "update users set name = $2, email = $3, role = $4 where id = $1"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(u.Id, u.Name, u.Email)
+	_, err = stmt.Exec(u.Id, u.Name, u.Email, u.Role)
 	return
 }
 
@@ -142,21 +143,21 @@ func (u *User) Session() (session Session, err error) {
 // UserByEmail gets a single user by email
 func UserByEmail(email string) (user User, err error) {
 	user = User{}
-	err = Db.QueryRow("SELECT id, name, email, password, created_at FROM users WHERE email = $1", email).
-		Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.CreatedAt)
+	err = Db.QueryRow("SELECT id, name, email, password, role, created_at FROM users WHERE email = $1", email).
+		Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Role, &user.CreatedAt)
 	return
 }
 
 // USers gets all users in the database and returns it
 func Users() (users []User, err error) {
-	rows, err := Db.Query("SELECT id, name, email, password, created_at FROM users")
+	rows, err := Db.Query("SELECT id, name, email, password, role, created_at FROM users")
 	if err != nil {
 		return
 	}
 	defer rows.Close()
 	for rows.Next() {
 		user := User{}
-		if err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.CreatedAt); err != nil {
+		if err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Role, &user.CreatedAt); err != nil {
 			return
 		}
 		users = append(users, user)

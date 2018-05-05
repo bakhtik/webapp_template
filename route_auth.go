@@ -39,6 +39,7 @@ func signupAccount(w http.ResponseWriter, req *http.Request) {
 		Name:     req.PostFormValue("name"),
 		Email:    req.PostFormValue("email"),
 		Password: req.PostFormValue("password"),
+		Role:     req.PostFormValue("role"),
 	}
 	if err = user.Create(); err != nil {
 		logger.SetPrefix("ERROR ")
