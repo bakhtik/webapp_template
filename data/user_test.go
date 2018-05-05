@@ -73,3 +73,88 @@ func Test_Users(t *testing.T) {
 		t.Error(u[0], users[0], "Wrong user retrieved")
 	}
 }
+
+func Test_CreateSession(t *testing.T) {
+	setup()
+	if err := users[0].Create(); err != nil {
+		t.Error(err, "Cannot create user.")
+	}
+	session, err := users[0].CreateSession()
+	if err != nil {
+		t.Error(err, "Cannot create session")
+	}
+	if session.UserId != users[0].Id {
+		t.Error("User not linked with session")
+	}
+}
+
+func Test_GetSession(t *testing.T) {
+	setup()
+	if err := users[0].Create(); err != nil {
+		t.Error(err, "Cannot create user.")
+	}
+	session, err := users[0].CreateSession()
+	if err != nil {
+		t.Error(err, "Cannot create session")
+	}
+
+	s, err := users[0].Session()
+	if err != nil {
+		t.Error(err, "Cannot get session")
+	}
+	if s.Id == 0 {
+		t.Error("No session retrieved")
+	}
+	if s.Id != session.Id {
+		t.Error("Different session retrieved")
+	}
+}
+
+func Test_checkValidSession(t *testing.T) {
+	setup()
+	if err := users[0].Create(); err != nil {
+		t.Error(err, "Cannot create user.")
+	}
+	session, err := users[0].CreateSession()
+	if err != nil {
+		t.Error(err, "Cannot create session")
+	}
+
+	uuid := session.Uuid
+
+	s := Session{Uuid: uuid}
+	err = s.Check()
+	if err != nil {
+		t.Error(err, "Cannot check session")
+	}
+}
+
+func Test_checkInvalidSession(t *testing.T) {
+	setup()
+	s := Session{Uuid: "123"}
+	err := s.Check()
+	if err == nil {
+		t.Error(err, "Session is not valid but is validated")
+	}
+}
+
+func Test_DeleteSession(t *testing.T) {
+	setup()
+	if err := users[0].Create(); err != nil {
+		t.Error(err, "Cannot create user.")
+	}
+	session, err := users[0].CreateSession()
+	if err != nil {
+		t.Error(err, "Cannot create session")
+	}
+
+	err = session.DeleteByUUID()
+	if err != nil {
+		t.Error(err, "Cannot delete session")
+	}
+	s := Session{Uuid: session.Uuid}
+	err = s.Check()
+	if err == nil {
+		t.Error(err, "Session is not deleted")
+	}
+}

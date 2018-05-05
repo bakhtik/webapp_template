@@ -47,10 +47,10 @@ func (s *Session) Check() (err error) {
 	return
 }
 
-// Get the user from the session
-func (session *Session) User() (user User, err error) {
+// User gets the user from the session
+func (s *Session) User() (user User, err error) {
 	user = User{}
-	err = Db.QueryRow("SELECT id, name, email, created_at FROM users WHERE id = $1", session.UserId).
+	err = Db.QueryRow("SELECT id, name, email, created_at FROM users WHERE id = $1", s.UserId).
 		Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt)
 	return
 }
@@ -106,7 +106,7 @@ func (u *User) Create() (err error) {
 }
 
 // Delete user from database
-func (user *User) Delete() (err error) {
+func (u *User) Delete() (err error) {
 	statement := "delete from users where id = $1"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
@@ -114,12 +114,12 @@ func (user *User) Delete() (err error) {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(user.Id)
+	_, err = stmt.Exec(u.Id)
 	return
 }
 
 // Update user information in the database
-func (user *User) Update() (err error) {
+func (u *User) Update() (err error) {
 	statement := "update users set name = $2, email = $3 where id = $1"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
@@ -127,11 +127,19 @@ func (user *User) Update() (err error) {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(user.Id, user.Name, user.Email)
+	_, err = stmt.Exec(u.Id, u.Name, u.Email)
 	return
 }
 
-// Get a single user by email
+// Session geta the session for an existing user
+func (u *User) Session() (session Session, err error) {
+	session = Session{}
+	err = Db.QueryRow("SELECT id, uuid, user_id, created_at FROM sessions WHERE user_id = $1", u.Id).
+		Scan(&session.Id, &session.Uuid, &session.UserId, &session.CreatedAt)
+	return
+}
+
+// UserByEmail gets a single user by email
 func UserByEmail(email string) (user User, err error) {
 	user = User{}
 	err = Db.QueryRow("SELECT id, name, email, password, created_at FROM users WHERE email = $1", email).
@@ -139,7 +147,7 @@ func UserByEmail(email string) (user User, err error) {
 	return
 }
 
-// Get all users in the database and returns it
+// USers gets all users in the database and returns it
 func Users() (users []User, err error) {
 	rows, err := Db.Query("SELECT id, name, email, password, created_at FROM users")
 	if err != nil {
