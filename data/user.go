@@ -105,10 +105,53 @@ func (u *User) Create() (err error) {
 	return
 }
 
+// Delete user from database
+func (user *User) Delete() (err error) {
+	statement := "delete from users where id = $1"
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(user.Id)
+	return
+}
+
+// Update user information in the database
+func (user *User) Update() (err error) {
+	statement := "update users set name = $2, email = $3 where id = $1"
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(user.Id, user.Name, user.Email)
+	return
+}
+
 // Get a single user by email
 func UserByEmail(email string) (user User, err error) {
 	user = User{}
 	err = Db.QueryRow("SELECT id, name, email, password, created_at FROM users WHERE email = $1", email).
 		Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.CreatedAt)
+	return
+}
+
+// Get all users in the database and returns it
+func Users() (users []User, err error) {
+	rows, err := Db.Query("SELECT id, name, email, password, created_at FROM users")
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		user := User{}
+		if err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.CreatedAt); err != nil {
+			return
+		}
+		users = append(users, user)
+	}
 	return
 }
