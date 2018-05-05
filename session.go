@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bakhtik/pob/data"
+	"github.com/bakhtik/webapp_template/data"
 )
 
 // Check if the user is logged in and has a session, if not err is not nil

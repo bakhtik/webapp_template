@@ -18,6 +18,7 @@ func main() {
 	http.HandleFunc("/signup", signup)
 	http.HandleFunc("/signup_account", signupAccount)
 	http.HandleFunc("/authenticate", authenticate)
+	http.HandleFunc("/logout", logout)
 
 	log.Fatal(http.ListenAndServe(config.Address, nil))
 }

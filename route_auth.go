@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/bakhtik/pob/data"
+	"github.com/bakhtik/webapp_template/data"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -82,18 +82,18 @@ func logout(w http.ResponseWriter, req *http.Request) {
 
 	sess, err := session(req)
 	if err != nil { // user already logged out
-		logger.SetPrefix("WARNING")
+		logger.SetPrefix("WARNING ")
 		logger.Println(err, `Failed to get cookie "session"`)
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
 	// delete the session
 	if err = sess.DeleteByUUID(); err != nil {
-		logger.SetPrefix("WARNING")
+		logger.SetPrefix("WARNING ")
 		logger.Println(err, "Failed to delete sesssion")
 	}
 	// remove the cookie
-	cookie = &http.Cookie{
+	cookie := &http.Cookie{
 		Name:   "session",
 		Value:  "",
 		MaxAge: -1,
