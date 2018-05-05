@@ -1,4 +1,0 @@
-ERROR 2018/05/05 17:10:42 route_auth.go:45: pq: column "uuid" of relation "users" does not exist Cannot create user
-ERROR 2018/05/05 17:10:50 route_auth.go:57: sql: no rows in result set Cannot find user
-WARNING2018/05/05 17:14:09 route_auth.go:86: http: named cookie not present Failed to get cookie "session"
-WARNING 2018/05/05 17:15:21 route_auth.go:86: http: named cookie not present Failed to get cookie "session"

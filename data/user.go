@@ -47,6 +47,14 @@ func (s *Session) Check() (err error) {
 	return
 }
 
+// Get the user from the session
+func (session *Session) User() (user User, err error) {
+	user = User{}
+	err = Db.QueryRow("SELECT id, name, email, created_at FROM users WHERE id = $1", session.UserId).
+		Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt)
+	return
+}
+
 // DeleteByUUID deletes session for database
 func (s *Session) DeleteByUUID() (err error) {
 	statement := "DELETE FROM sessions WHERE uuid = $1"
@@ -57,6 +65,20 @@ func (s *Session) DeleteByUUID() (err error) {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(s.Uuid)
+	return
+}
+
+// Delete all sessions from database
+func SessionDeleteAll() (err error) {
+	statement := "delete from sessions"
+	_, err = Db.Exec(statement)
+	return
+}
+
+// Delete all users from database
+func UserDeleteAll() (err error) {
+	statement := "delete from users"
+	_, err = Db.Exec(statement)
 	return
 }
 

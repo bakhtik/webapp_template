@@ -1,4 +1,11 @@
 {{ define "content" }}
 <h3>Index Page</h3>
 
+<p>Hello,
+{{ if . }}
+  {{ .Name }}
+{{ else }}
+  Stranger
+{{ end }}
+!</p>
 {{ end }}
