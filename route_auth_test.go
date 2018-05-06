@@ -1,42 +1,60 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 )
 
-func Test_Get_Login(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/login", login)
+func TestGetLogin(t *testing.T) {
+	req := httptest.NewRequest("GET", "/login", nil)
+	w := httptest.NewRecorder()
+	login(w, req)
 
-	writer := httptest.NewRecorder()
-	request, _ := http.NewRequest("GET", "/login", nil)
-	mux.ServeHTTP(writer, request)
+	resp := w.Result()
+	body, _ := ioutil.ReadAll(resp.Body)
 
-	if writer.Code != 200 {
-		t.Errorf("Response code is %v", writer.Code)
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Response code is %v", resp.StatusCode)
 	}
-	body := writer.Body.String()
-	if strings.Contains(body, "Sign in") == false {
+	if strings.Contains(string(body), "Sign in") == false {
 		t.Errorf("Body does not contain Sign in")
 	}
 }
 
-func Test_Get_Signup(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/signup", signup)
+func TestGetSignup(t *testing.T) {
+	req := httptest.NewRequest("GET", "/signup", nil)
+	w := httptest.NewRecorder()
+	signup(w, req)
 
-	writer := httptest.NewRecorder()
-	request, _ := http.NewRequest("GET", "/signup", nil)
-	mux.ServeHTTP(writer, request)
+	resp := w.Result()
+	body, _ := ioutil.ReadAll(resp.Body)
 
-	if writer.Code != 200 {
-		t.Errorf("Response code is %v", writer.Code)
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Response code is %v", resp.StatusCode)
 	}
-	body := writer.Body.String()
-	if strings.Contains(body, "Sign up for the account below") == false {
-		t.Errorf(`Body does not contain "Sign up for the account below"`)
+	want := "Sign up for the account below"
+	if strings.Contains(string(body), want) == false {
+		t.Errorf("Body does not contain %q", want)
+	}
+}
+
+func TestSignupAccount(t *testing.T) {
+	req := httptest.NewRequest("POST", "/signup_account", nil)
+	req.ParseForm()
+	req.PostForm.Add("name", "John Doe")
+	req.PostForm.Add("email", "john_doe@gmail.com")
+	req.PostForm.Add("password", "123")
+	req.PostForm.Add("role", "user")
+	w := httptest.NewRecorder()
+	signupAccount(w, req)
+
+	resp := w.Result()
+	// body, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusSeeOther {
+		t.Errorf("Response code is %v", resp.StatusCode)
 	}
 }

@@ -1,3 +1,11 @@
 ERROR 2018/05/06 16:52:42 route_auth.go:59: sql: no rows in result set Cannot find user
 WARNING 2018/05/06 17:17:36 route_auth.go:124: <nil>: User admin has not permission for hendler 0x1310dc0
 WARNING 2018/05/06 17:21:32 route_auth.go:125: <nil>: User bak has not permission for requested page
+ERROR 2018/05/07 01:17:01 route_auth.go:47: dial tcp [::1]:5432: connect: connection refused Cannot create user
+ERROR 2018/05/07 01:19:04 route_auth.go:47: dial tcp [::1]:5432: connect: connection refused Cannot create user
+ERROR 2018/05/07 01:19:57 route_auth.go:47: dial tcp [::1]:5432: connect: connection refused Cannot create user
+ERROR 2018/05/07 01:53:43 route_auth.go:47: pq: duplicate key value violates unique constraint "users_email_key" Cannot create user
+ERROR 2018/05/07 01:55:39 route_auth.go:47: pq: duplicate key value violates unique constraint "users_email_key" Cannot create user
+ERROR 2018/05/07 01:56:14 route_auth.go:47: pq: duplicate key value violates unique constraint "users_email_key" Cannot create user
+ERROR 2018/05/07 01:56:32 route_auth.go:47: pq: duplicate key value violates unique constraint "users_email_key" Cannot create user
+ERROR 2018/05/07 01:56:55 route_auth.go:47: pq: duplicate key value violates unique constraint "users_email_key" Cannot create user
