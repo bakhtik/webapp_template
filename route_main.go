@@ -3,7 +3,7 @@ package main
 import "net/http"
 
 func index(w http.ResponseWriter, req *http.Request) {
-	if sess, err := session(req); err != nil {
+	if sess, err := session(w, req); err != nil {
 		generateHTML(w, nil, "layout", "public.navbar", "index")
 	} else {
 		user, err := sess.User()
@@ -16,7 +16,7 @@ func index(w http.ResponseWriter, req *http.Request) {
 }
 
 func admin(w http.ResponseWriter, req *http.Request) {
-	if sess, err := session(req); err != nil {
+	if sess, err := session(w, req); err != nil {
 		generateHTML(w, nil, "layout", "public.navbar", "index")
 	} else {
 		user, err := sess.User()

@@ -10,7 +10,7 @@ import (
 // GET /login
 // Show the login page
 func login(w http.ResponseWriter, req *http.Request) {
-	if _, err := session(req); err == nil { // user already logged in
+	if _, err := session(w, req); err == nil { // user already logged in
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
@@ -20,7 +20,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 // GET /signup
 // Show the signup page
 func signup(w http.ResponseWriter, req *http.Request) {
-	if _, err := session(req); err == nil { // user already logged in
+	if _, err := session(w, req); err == nil { // user already logged in
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
@@ -81,7 +81,7 @@ func authenticate(w http.ResponseWriter, req *http.Request) {
 // Logs the user out
 func logout(w http.ResponseWriter, req *http.Request) {
 
-	sess, err := session(req)
+	sess, err := session(w, req)
 	if err != nil { // user already logged out
 		logger.SetPrefix("WARNING ")
 		logger.Println(err, `Failed to get cookie "session"`)

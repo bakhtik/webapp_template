@@ -10,8 +10,9 @@ import (
 )
 
 type Configuration struct {
-	Address string
-	Static  string
+	Address       string
+	Static        string
+	SessionLength int
 }
 
 var config Configuration

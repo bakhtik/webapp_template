@@ -17,15 +17,16 @@ type User struct {
 }
 
 type Session struct {
-	Id        int
-	Uuid      string
-	UserId    int
-	CreatedAt time.Time
+	Id           int
+	Uuid         string
+	UserId       int
+	LastActivity time.Time
+	CreatedAt    time.Time
 }
 
 // CreateSession creates a new session for existing user
 func (u *User) CreateSession() (session Session, err error) {
-	statement := "INSERT INTO sessions (uuid, user_id, created_at) VALUES ($1, $2, $3) RETURNING id, uuid, user_id, created_at"
+	statement := "INSERT INTO sessions (uuid, user_id, last_activity, created_at) VALUES ($1, $2, $3, $4) RETURNING id, uuid, user_id, last_activity, created_at"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		return
@@ -37,14 +38,14 @@ func (u *User) CreateSession() (session Session, err error) {
 	if err != nil {
 		return
 	}
-	err = stmt.QueryRow(uuidV4, u.Id, time.Now()).Scan(&session.Id, &session.Uuid, &session.UserId, &session.CreatedAt)
+	err = stmt.QueryRow(uuidV4, u.Id, time.Now(), time.Now()).Scan(&session.Id, &session.Uuid, &session.UserId, &session.LastActivity, &session.CreatedAt)
 	return
 }
 
 // Check if session is valid in the database
 func (s *Session) Check() (err error) {
-	err = Db.QueryRow("SELECT id, uuid, user_id, created_at FROM sessions WHERE uuid = $1", s.Uuid).
-		Scan(&s.Id, &s.Uuid, &s.UserId, &s.CreatedAt)
+	err = Db.QueryRow("SELECT id, uuid, user_id, last_activity, created_at FROM sessions WHERE uuid = $1", s.Uuid).
+		Scan(&s.Id, &s.Uuid, &s.UserId, &s.LastActivity, &s.CreatedAt)
 	return
 }
 
@@ -74,6 +75,13 @@ func SessionDeleteAll() (err error) {
 	statement := "delete from sessions"
 	_, err = Db.Exec(statement)
 	return
+}
+
+// CleanSessions removes expired sessions from the database
+func CleanSessions(sessionLength int) (err error) {
+	statement := "DELETE FROM sessions WHERE last_activity < $1"
+	_, err = Db.Exec(statement, time.Now().Add(-time.Duration(sessionLength)))
+
 }
 
 // Delete all users from database
@@ -132,11 +140,11 @@ func (u *User) Update() (err error) {
 	return
 }
 
-// Session geta the session for an existing user
+// Session gets the session for an existing user
 func (u *User) Session() (session Session, err error) {
 	session = Session{}
-	err = Db.QueryRow("SELECT id, uuid, user_id, created_at FROM sessions WHERE user_id = $1", u.Id).
-		Scan(&session.Id, &session.Uuid, &session.UserId, &session.CreatedAt)
+	err = Db.QueryRow("SELECT id, uuid, user_id, last_activity, created_at FROM sessions WHERE user_id = $1", u.Id).
+		Scan(&session.Id, &session.Uuid, &session.UserId, &session.LastActivity, &session.CreatedAt)
 	return
 }
 
@@ -148,7 +156,7 @@ func UserByEmail(email string) (user User, err error) {
 	return
 }
 
-// USers gets all users in the database and returns it
+// Users gets all users in the database and returns it
 func Users() (users []User, err error) {
 	rows, err := Db.Query("SELECT id, name, email, password, role, created_at FROM users")
 	if err != nil {

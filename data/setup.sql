@@ -15,5 +15,6 @@ create table sessions (
   id         serial primary key,
   uuid       varchar(64) not null unique,
   user_id    integer references users(id),
+  last_activity timestamp not null,
   created_at timestamp not null   
 );
