@@ -80,8 +80,8 @@ func SessionDeleteAll() (err error) {
 // CleanSessions removes expired sessions from the database
 func CleanSessions(sessionLength int) (err error) {
 	statement := "DELETE FROM sessions WHERE last_activity < $1"
-	_, err = Db.Exec(statement, time.Now().Add(-time.Duration(sessionLength)))
-
+	_, err = Db.Exec(statement, time.Now().Add(-time.Second*time.Duration(sessionLength)))
+	return
 }
 
 // Delete all users from database

@@ -1,0 +1,1 @@
+ERROR 2018/05/06 16:52:42 route_auth.go:59: sql: no rows in result set Cannot find user

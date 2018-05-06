@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/bakhtik/webapp_template/data"
 	"golang.org/x/crypto/bcrypt"
@@ -82,12 +83,6 @@ func authenticate(w http.ResponseWriter, req *http.Request) {
 func logout(w http.ResponseWriter, req *http.Request) {
 
 	sess, err := session(w, req)
-	if err != nil { // user already logged out
-		logger.SetPrefix("WARNING ")
-		logger.Println(err, `Failed to get cookie "session"`)
-		http.Redirect(w, req, "/", http.StatusSeeOther)
-		return
-	}
 	// delete the session
 	if err = sess.DeleteByUUID(); err != nil {
 		logger.SetPrefix("WARNING ")
@@ -101,5 +96,25 @@ func logout(w http.ResponseWriter, req *http.Request) {
 	}
 	http.SetCookie(w, cookie)
 
+	// Clean up sessions
+	if time.Now().Sub(sessionsCleaned) > (time.Second * time.Duration(config.SessionLength)) {
+		go data.CleanSessions(config.SessionLength)
+	}
+
 	http.Redirect(w, req, "/", http.StatusSeeOther)
+}
+
+// for authorized access only to handlers
+func authorized(h http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		_, err := session(w, req)
+		if err != nil {
+			//http.Error(w, "not logged in", http.StatusUnauthorized)
+			logger.SetPrefix("WARNING ")
+			logger.Println(err, `Failed to get/verify cookie "session"`)
+			http.Redirect(w, req, "/", http.StatusSeeOther)
+			return // don't call original handler
+		}
+		h.ServeHTTP(w, req)
+	})
 }
