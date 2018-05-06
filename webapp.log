@@ -1,1 +1,3 @@
 ERROR 2018/05/06 16:52:42 route_auth.go:59: sql: no rows in result set Cannot find user
+WARNING 2018/05/06 17:17:36 route_auth.go:124: <nil>: User admin has not permission for hendler 0x1310dc0
+WARNING 2018/05/06 17:21:32 route_auth.go:125: <nil>: User bak has not permission for requested page

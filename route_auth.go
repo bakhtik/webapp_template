@@ -105,15 +105,27 @@ func logout(w http.ResponseWriter, req *http.Request) {
 }
 
 // for authorized access only to handlers
-func authorized(h http.HandlerFunc) http.HandlerFunc {
+func authorized(h http.HandlerFunc, roles ...string) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		_, err := session(w, req)
+		// check if authorized
+		sess, err := session(w, req)
 		if err != nil {
 			//http.Error(w, "not logged in", http.StatusUnauthorized)
 			logger.SetPrefix("WARNING ")
 			logger.Println(err, `Failed to get/verify cookie "session"`)
 			http.Redirect(w, req, "/", http.StatusSeeOther)
 			return // don't call original handler
+		}
+
+		// permission check
+		if roles != nil {
+			user, err := sess.User()
+			if !strSliceContains(roles, user.Role) {
+				logger.SetPrefix("WARNING ")
+				logger.Printf("%v: User %s has not permission for requested page", err, user.Name)
+				http.Error(w, "You must have admin rights to enter the page", http.StatusForbidden)
+				return
+			}
 		}
 		h.ServeHTTP(w, req)
 	})

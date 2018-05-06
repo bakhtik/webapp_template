@@ -53,3 +53,12 @@ func generateHTML(w http.ResponseWriter, data interface{}, filenames ...string) 
 func version() string {
 	return "0.1"
 }
+
+func strSliceContains(slice []string, value string) (ok bool) {
+	for _, v := range slice {
+		if v == value {
+			return true
+		}
+	}
+	return
+}

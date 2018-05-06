@@ -22,10 +22,6 @@ func admin(w http.ResponseWriter, req *http.Request) {
 		logger.SetPrefix("ERROR ")
 		logger.Println(err, "Cannot fetch user")
 	}
-	if user.Role != "admin" {
-		http.Error(w, "You must have admin rights to enter the page", http.StatusForbidden)
-		return
-	}
 	generateHTML(w, user, "layout", "private.navbar", "admin")
 
 }
