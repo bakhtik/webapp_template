@@ -13,3 +13,4 @@ ERROR 2018/05/07 09:03:08 route_auth.go:47: pq: duplicate key value violates uni
 ERROR 2018/05/07 15:56:17 route_auth.go:59: sql: no rows in result set Cannot find user
 WARNING 2018/05/07 16:28:10 route_auth.go:115: http: named cookie not present Failed to get/verify cookie "session"
 WARNING 2018/05/07 16:28:48 route_auth.go:131: <nil>: User user has not permission for requested page
+WARNING 2018/05/08 00:27:05 route_auth.go:118: http: named cookie not present Failed to get/verify cookie "session"

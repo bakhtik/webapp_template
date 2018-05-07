@@ -14,13 +14,20 @@ func main() {
 	files := http.FileServer(http.Dir(config.Static))
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
-	mux.Handle("/", logged(http.HandlerFunc(index)))
-	mux.HandleFunc("/login", login)
-	mux.HandleFunc("/signup", signup)
-	mux.HandleFunc("/signup_account", signupAccount)
-	mux.HandleFunc("/authenticate", authenticate)
-	mux.Handle("/logout", authenticated(http.HandlerFunc(logout)))
-	mux.Handle("/admin", authenticated(authorized(http.HandlerFunc(admin), "admin")))
+	handlers := map[string]http.Handler{
+		"/":               http.HandlerFunc(index),
+		"/favicon.ico":    http.NotFoundHandler(),
+		"/login":          http.HandlerFunc(login),
+		"/signup":         http.HandlerFunc(signup),
+		"/signup_account": http.HandlerFunc(signupAccount),
+		"/authenticate":   http.HandlerFunc(authenticate),
+		"/logout":         authenticated(http.HandlerFunc(logout)),
+		"/admin":          authenticated(authorized(http.HandlerFunc(admin), "admin")),
+	}
+
+	for pattern, handler := range handlers {
+		mux.Handle(pattern, logged(handler))
+	}
 
 	log.Fatal(http.ListenAndServe(config.Address, mux))
 }

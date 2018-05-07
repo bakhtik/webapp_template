@@ -150,6 +150,9 @@ func logged(next http.Handler) http.Handler {
 		c := httptest.NewRecorder()
 
 		next.ServeHTTP(c, req)
+		// log
+		resp := c.Result()
+		body, _ := ioutil.ReadAll(resp.Body)
 
 		// copy everything from response recorder
 		// to actual response writer
@@ -159,10 +162,7 @@ func logged(next http.Handler) http.Handler {
 		w.WriteHeader(c.Code)
 		c.Body.WriteTo(w)
 
-		// log
-		resp := c.Result()
-		body, _ := ioutil.ReadAll(resp.Body)
 		// fmt.Print(req.RemoteAddr, req.Method, req.RequestURI, "response: ", w.)
-		fmt.Printf("%s %s %d %v %q\n", req.Method, req.RequestURI, resp.StatusCode, resp.Header, string(body))
+		fmt.Printf("%s %s %s %d %d\n", req.RemoteAddr, req.Method, req.RequestURI, resp.StatusCode, len(body))
 	})
 }
