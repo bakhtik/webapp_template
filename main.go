@@ -8,18 +8,19 @@ import (
 
 func main() {
 	fmt.Println("Webapp template", version(), "started at", config.Address)
+	mux := http.NewServeMux()
 
 	// handle static assets
 	files := http.FileServer(http.Dir(config.Static))
-	http.Handle("/static/", http.StripPrefix("/static/", files))
+	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
-	http.HandleFunc("/", index)
-	http.HandleFunc("/login", login)
-	http.HandleFunc("/signup", signup)
-	http.HandleFunc("/signup_account", signupAccount)
-	http.HandleFunc("/authenticate", authenticate)
-	http.HandleFunc("/logout", authorized(logout))
-	http.HandleFunc("/admin", authorized(admin, "admin"))
+	mux.HandleFunc("/", index)
+	mux.HandleFunc("/login", login)
+	mux.HandleFunc("/signup", signup)
+	mux.HandleFunc("/signup_account", signupAccount)
+	mux.HandleFunc("/authenticate", authenticate)
+	mux.Handle("/logout", authenticated(http.HandlerFunc(logout)))
+	mux.Handle("/admin", authenticated(authorized(http.HandlerFunc(admin), "admin")))
 
-	log.Fatal(http.ListenAndServe(config.Address, nil))
+	log.Fatal(http.ListenAndServe(config.Address, mux))
 }

@@ -105,10 +105,10 @@ func logout(w http.ResponseWriter, req *http.Request) {
 }
 
 // for authorized access only to handlers
-func authorized(h http.HandlerFunc, roles ...string) http.HandlerFunc {
+func authenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// check if authorized
-		sess, err := session(w, req)
+		// check if authenticated
+		_, err := session(w, req)
 		if err != nil {
 			//http.Error(w, "not logged in", http.StatusUnauthorized)
 			logger.SetPrefix("WARNING ")
@@ -116,8 +116,14 @@ func authorized(h http.HandlerFunc, roles ...string) http.HandlerFunc {
 			http.Redirect(w, req, "/", http.StatusSeeOther)
 			return // don't call original handler
 		}
+		next.ServeHTTP(w, req)
+	})
+}
 
-		// permission check
+// permission check
+func authorized(next http.Handler, roles ...string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		sess, _ := session(w, req)
 		if roles != nil {
 			user, err := sess.User()
 			if !strSliceContains(roles, user.Role) {
@@ -127,6 +133,6 @@ func authorized(h http.HandlerFunc, roles ...string) http.HandlerFunc {
 				return
 			}
 		}
-		h.ServeHTTP(w, req)
+		next.ServeHTTP(w, req)
 	})
 }

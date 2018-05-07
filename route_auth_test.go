@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/bakhtik/webapp_template/data"
 )
 
 func TestGetLogin(t *testing.T) {
@@ -42,6 +44,7 @@ func TestGetSignup(t *testing.T) {
 }
 
 func TestSignupAccount(t *testing.T) {
+	defer data.UserDeleteAll()
 	req := httptest.NewRequest("POST", "/signup_account", nil)
 	req.ParseForm()
 	req.PostForm.Add("name", "John Doe")
@@ -57,4 +60,6 @@ func TestSignupAccount(t *testing.T) {
 	if resp.StatusCode != http.StatusSeeOther {
 		t.Errorf("Response code is %v", resp.StatusCode)
 	}
+
+	// TODO check if user is in the database
 }
