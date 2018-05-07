@@ -1,12 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
-	"net"
 	"net/http"
-	"net/http/httptest"
-	"net/url"
 	"time"
 
 	"github.com/bakhtik/webapp_template/data"
@@ -139,43 +134,5 @@ func authorized(next http.Handler, roles ...string) http.Handler {
 			}
 		}
 		next.ServeHTTP(w, req)
-	})
-}
-
-// log handler
-func logged(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// Create a response wrapper:
-
-		// switch out response writer for a recorder
-		// for all subsequent handlers
-		c := httptest.NewRecorder()
-
-		next.ServeHTTP(c, req)
-		// log
-		resp := c.Result()
-		body, _ := ioutil.ReadAll(resp.Body)
-
-		// copy everything from response recorder
-		// to actual response writer
-		for k, v := range c.HeaderMap {
-			w.Header()[k] = v
-		}
-		w.WriteHeader(c.Code)
-		c.Body.WriteTo(w)
-
-		// write log information
-		host, _, err := net.SplitHostPort(req.RemoteAddr)
-		if err != nil {
-			host = req.RemoteAddr
-		}
-		username := "-"
-		if url.User != nil {
-			if name := req.URL.User.Username(); name != "" {
-				username = name
-			}
-		}
-
-		fmt.Printf("%s - %s [%v] \"%s %s %s\" %d %d\n", host, username, time.Now().Format("02/Jan/2006:15:04:05 -0700"), req.Method, req.RequestURI, req.Proto, resp.StatusCode, len(body))
 	})
 }

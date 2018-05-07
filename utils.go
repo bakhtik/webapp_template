@@ -4,15 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
+	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os"
+	"time"
 )
 
 type Configuration struct {
 	Address       string
 	Static        string
 	SessionLength int
+	LogFile       string
 }
 
 var config Configuration
@@ -61,4 +68,57 @@ func strSliceContains(slice []string, value string) (ok bool) {
 		}
 	}
 	return
+}
+
+// handler for Apache-style logs
+func loggingHandler(writer io.Writer, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		// Create a response wrapper:
+
+		// switch out response writer for a recorder
+		// for all subsequent handlers
+		c := httptest.NewRecorder()
+
+		next.ServeHTTP(c, req)
+		// log
+		resp := c.Result()
+		body, _ := ioutil.ReadAll(resp.Body)
+
+		// copy everything from response recorder
+		// to actual response writer
+		for k, v := range c.HeaderMap {
+			w.Header()[k] = v
+		}
+		w.WriteHeader(c.Code)
+		c.Body.WriteTo(w)
+
+		// write log information
+		host, _, err := net.SplitHostPort(req.RemoteAddr)
+		if err != nil {
+			host = req.RemoteAddr
+		}
+		username := "-"
+		if url.User != nil {
+			if name := req.URL.User.Username(); name != "" {
+				username = name
+			}
+		}
+
+		fmt.Fprintf(writer, "%s - %s [%v] \"%s %s %s\" %d %d\n", host, username, time.Now().Format("02/Jan/2006:15:04:05 -0700"), req.Method, req.RequestURI, req.Proto, resp.StatusCode, len(body))
+	})
+}
+
+func logged(h http.Handler) http.Handler {
+	switch config.LogFile {
+	case "":
+		return h
+	case "stdout":
+		return loggingHandler(os.Stdout, h)
+	default:
+		logFile, err := os.OpenFile(config.LogFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+		if err != nil {
+			panic(err)
+		}
+		return loggingHandler(logFile, h)
+	}
 }
