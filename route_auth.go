@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"time"
 
 	"github.com/bakhtik/webapp_template/data"
@@ -162,7 +164,18 @@ func logged(next http.Handler) http.Handler {
 		w.WriteHeader(c.Code)
 		c.Body.WriteTo(w)
 
-		// fmt.Print(req.RemoteAddr, req.Method, req.RequestURI, "response: ", w.)
-		fmt.Printf("%s %s %s %d %d\n", req.RemoteAddr, req.Method, req.RequestURI, resp.StatusCode, len(body))
+		// write log information
+		host, _, err := net.SplitHostPort(req.RemoteAddr)
+		if err != nil {
+			host = req.RemoteAddr
+		}
+		username := "-"
+		if url.User != nil {
+			if name := req.URL.User.Username(); name != "" {
+				username = name
+			}
+		}
+
+		fmt.Printf("%s - %s [%v] \"%s %s %s\" %d %d\n", host, username, time.Now().Format("02/Jan/2006:15:04:05 -0700"), req.Method, req.RequestURI, req.Proto, resp.StatusCode, len(body))
 	})
 }
