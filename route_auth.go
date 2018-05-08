@@ -53,6 +53,10 @@ func signupAccount(w http.ResponseWriter, req *http.Request) {
 // Authenticate the user given the email and password
 func authenticate(w http.ResponseWriter, req *http.Request) {
 	err := req.ParseForm()
+	if err != nil {
+		logger.SetPrefix("ERROR ")
+		logger.Println(err, "Cannot parse form")
+	}
 	user, err := data.UserByEmail(req.PostFormValue("email"))
 	if err != nil {
 		logger.SetPrefix("ERROR ")
@@ -114,4 +118,59 @@ func profile(w http.ResponseWriter, req *http.Request) {
 		logger.Println(err, "Cannot fetch user")
 	}
 	generateHTML(w, user, "layout", "private.navbar", "profile")
+}
+
+// POST /change_account
+// changes user account (password)
+func changeAccount(w http.ResponseWriter, req *http.Request) {
+	err := req.ParseForm()
+	if err != nil {
+		logger.SetPrefix("ERROR ")
+		logger.Println(err, "Cannot parse form")
+	}
+
+	user, err := data.UserByEmail(req.PostFormValue("email"))
+	if err != nil {
+		logger.SetPrefix("ERROR ")
+		logger.Println(err, "Cannot find user")
+		http.Error(w, "Cannot find user", http.StatusForbidden)
+		return
+	}
+
+	// check if old password matches with existing one
+	// does the entered password match the stored password?
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.PostFormValue("old_password"))); err != nil {
+		logger.SetPrefix("ERROR ")
+		logger.Println(err, "Old passwords invalid")
+		http.Error(w, "Old password invalid", http.StatusForbidden)
+		return
+	}
+
+	newPassword, confirmPassword := req.PostFormValue("new_password"), req.PostFormValue("confirm_password")
+	// check if provided passwords are the same
+	if newPassword != confirmPassword {
+		logger.SetPrefix("WARNING ")
+		logger.Printf("User %s: confirm password mismatch with new password", user.Name)
+		http.Error(w, "New passwords must match", http.StatusForbidden)
+		return
+	}
+
+	// generate hash for the provided password
+	bs, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
+	if err != nil {
+		logger.SetPrefix("ERROR ")
+		logger.Println(err, "Cannot generate hash for new password")
+		http.Error(w, "Cannot generate hash for new password", http.StatusForbidden)
+		return
+	}
+	// store new password in the database
+	user.Password = string(bs)
+	err = user.Update()
+	if err != nil {
+		logger.SetPrefix("ERROR ")
+		logger.Println(err, "Cannot update user in the database")
+		http.Error(w, "Cannot generate hash for new password", http.StatusForbidden)
+		return
+	}
+	http.Redirect(w, req, "/", http.StatusSeeOther)
 }

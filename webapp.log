@@ -18,3 +18,14 @@ WARNING 2018/05/08 01:19:25 route_auth.go:131: <nil>: User user has not permissi
 WARNING 2018/05/08 01:19:38 route_auth.go:131: <nil>: User user has not permission for requested page
 ERROR 2018/05/08 09:59:14 route_auth.go:59: dial tcp [::1]:5432: connect: connection refused Cannot find user
 WARNING 2018/05/08 10:00:23 utils.go:137: http: named cookie not present Failed to get/verify cookie "session"
+WARNING 2018/05/08 12:12:10 route_auth.go:151: User bak: confirm password mismatch with new password
+ERROR 2018/05/08 12:12:45 route_auth.go:143: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid
+ERROR 2018/05/08 12:12:55 route_auth.go:143: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid
+ERROR 2018/05/08 12:13:03 route_auth.go:143: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid
+ERROR 2018/05/08 12:13:09 route_auth.go:143: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid
+ERROR 2018/05/08 12:13:34 route_auth.go:143: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid
+WARNING 2018/05/08 12:14:09 route_auth.go:151: User bak: confirm password mismatch with new password
+ERROR 2018/05/08 12:14:17 route_auth.go:143: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid
+ERROR 2018/05/08 12:14:27 route_auth.go:143: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid
+WARNING 2018/05/08 12:16:54 route_auth.go:151: User bak: confirm password mismatch with new password
+ERROR 2018/05/08 12:17:04 route_auth.go:143: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid

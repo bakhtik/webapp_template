@@ -23,6 +23,7 @@ func main() {
 		"/authenticate":   http.HandlerFunc(authenticate),
 		"/logout":         authenticated(http.HandlerFunc(logout)),
 		"/profile":        authenticated(http.HandlerFunc(profile)),
+		"/change_account": authenticated(http.HandlerFunc(changeAccount)),
 		"/admin":          authenticated(authorized(http.HandlerFunc(admin), "admin")),
 	}
 

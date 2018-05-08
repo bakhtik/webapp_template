@@ -129,14 +129,14 @@ func (u *User) Delete() (err error) {
 
 // Update user information in the database
 func (u *User) Update() (err error) {
-	statement := "update users set name = $2, email = $3, role = $4 where id = $1"
+	statement := "update users set name = $2, email = $3, password = $4, role = $5 where id = $1"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(u.Id, u.Name, u.Email, u.Role)
+	_, err = stmt.Exec(u.Id, u.Name, u.Email, u.Password, u.Role)
 	return
 }
 
