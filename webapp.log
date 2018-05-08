@@ -35,3 +35,8 @@ WARNING 2018/05/08 12:19:38 route_auth.go:153: User bak: confirm password mismat
 WARNING 2018/05/08 12:20:47 utils.go:137: http: named cookie not present Failed to get/verify cookie "session"
 WARNING 2018/05/08 15:54:25 utils.go:137: http: named cookie not present Failed to get/verify cookie "session"
 WARNING 2018/05/08 16:08:45 utils.go:139: http: named cookie not present Failed to get/verify cookie "session"
+WARNING 2018/05/08 16:22:04 utils.go:139: http: named cookie not present Failed to get/verify cookie "session"
+WARNING 2018/05/08 16:32:59 utils.go:139: http: named cookie not present Failed to get/verify cookie "session"
+WARNING 2018/05/08 16:33:09 utils.go:139: http: named cookie not present Failed to get/verify cookie "session"
+WARNING 2018/05/08 16:33:21 utils.go:139: http: named cookie not present Failed to get/verify cookie "session"
+WARNING 2018/05/08 17:00:43 utils.go:139: http: named cookie not present Failed to get/verify cookie "session"

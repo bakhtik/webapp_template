@@ -21,26 +21,3 @@ func index(w http.ResponseWriter, req *http.Request) {
 		generateHTML(w, data, "layout", "private.navbar", "index")
 	}
 }
-
-func admin(w http.ResponseWriter, req *http.Request) {
-	sess, _ := session(w, req)
-	user, err := sess.User()
-	if err != nil {
-		logger.SetPrefix("ERROR ")
-		logger.Println(err, "Cannot fetch user")
-	}
-	users, err := data.Users()
-	if err != nil {
-		logger.SetPrefix("ERROR ")
-		logger.Println(err, "Cannot fetch users")
-	}
-	data := struct {
-		data.User
-		Users []data.User
-	}{
-		user,
-		users,
-	}
-	generateHTML(w, data, "layout", "private.navbar", "admin")
-
-}

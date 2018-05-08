@@ -15,16 +15,19 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
 	handlers := map[string]http.Handler{
-		"/":               http.HandlerFunc(index),
-		"/favicon.ico":    http.NotFoundHandler(),
-		"/login":          http.HandlerFunc(login),
-		"/signup":         http.HandlerFunc(signup),
-		"/signup_account": http.HandlerFunc(signupAccount),
-		"/authenticate":   http.HandlerFunc(authenticate),
-		"/logout":         authenticated(http.HandlerFunc(logout)),
-		"/profile":        authenticated(http.HandlerFunc(profile)),
-		"/change_account": authenticated(http.HandlerFunc(changeAccount)),
-		"/admin":          authenticated(authorized(http.HandlerFunc(admin), "admin")),
+		"/":                     http.HandlerFunc(index),
+		"/favicon.ico":          http.NotFoundHandler(),
+		"/login":                http.HandlerFunc(login),
+		"/signup":               http.HandlerFunc(signup),
+		"/signup_account":       http.HandlerFunc(signupAccount),
+		"/authenticate":         http.HandlerFunc(authenticate),
+		"/logout":               authenticated(http.HandlerFunc(logout)),
+		"/profile":              authenticated(http.HandlerFunc(profile)),
+		"/change_account":       authenticated(http.HandlerFunc(changeAccount)),
+		"/admin":                authenticated(authorized(http.HandlerFunc(admin), "admin")),
+		"/admin/delete_user":    authenticated(authorized(http.HandlerFunc(deleteUser), "admin")),
+		"/admin/update_user":    authenticated(authorized(http.HandlerFunc(profileAdmin), "admin")),
+		"/admin/change_account": authenticated(authorized(http.HandlerFunc(changeAccountAdmin), "admin")),
 	}
 
 	for pattern, handler := range handlers {

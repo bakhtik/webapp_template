@@ -5,7 +5,8 @@
   {{ range $i, $v := $.Users }}
     <tr>
       <td>{{ $v.Name }}</td><td>{{ $v.Email }}</td><td>{{ $v.Role }}</td><td>{{ "02/Jan/2006:15:04:05 -0700" | $v.CreatedAt.Format }}</td>
-      <td><a href="#">Update</a></td><td><a href="#">Delete</a></td>
+      <td><a href="/admin/update_user?email={{ $v.Email }}">Update</a></td>
+      <td><a href="/admin/delete_user?email={{ $v.Email }}">Delete</a></td>
     </tr>
   {{ end }}
 </table>

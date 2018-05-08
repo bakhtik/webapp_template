@@ -1,0 +1,23 @@
+{{ define "content" }}
+
+{{ if . }}
+{{ $u := .UserForUpdate }}
+<form action="/admin/change_account" method="post">
+  <p>User Profile</p>
+  <input type="text" name="name" placeholder="Name" value="{{ $u.Name }}">
+  <input type="email" name="email" placeholder="Email address" value="{{ $u.Email }}">
+  <select name="role" id="sr">
+      <option value="user">user</option>
+      <option value="admin">admin</option>
+  </select>
+  <input type="password" name="new_password" placeholder="New password">
+  <input type="password" name="confirm_password" placeholder="Confirm new password">
+  <input type="hidden" name="origin_email" value="{{ $u.Email }}">
+  <button type="submit">Save</button>
+</form>
+<form actin="reset_password">
+  <button type="submit">Reset password</button>
+</form>
+{{ end }}
+
+{{ end }}

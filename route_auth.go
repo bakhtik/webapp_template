@@ -168,6 +168,8 @@ func changeAccount(w http.ResponseWriter, req *http.Request) {
 	}
 	// store new password in the database
 	user.Password = string(bs)
+
+	// update user
 	err = user.Update()
 	if err != nil {
 		logger.SetPrefix("ERROR ")
