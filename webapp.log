@@ -29,3 +29,9 @@ ERROR 2018/05/08 12:14:17 route_auth.go:143: crypto/bcrypt: hashedPassword is no
 ERROR 2018/05/08 12:14:27 route_auth.go:143: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid
 WARNING 2018/05/08 12:16:54 route_auth.go:151: User bak: confirm password mismatch with new password
 ERROR 2018/05/08 12:17:04 route_auth.go:143: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid
+WARNING 2018/05/08 12:19:01 route_auth.go:153: User bak: confirm password mismatch with new password
+ERROR 2018/05/08 12:19:30 route_auth.go:144: crypto/bcrypt: hashedPassword is not the hash of the given password Old passwords invalid
+WARNING 2018/05/08 12:19:38 route_auth.go:153: User bak: confirm password mismatch with new password
+WARNING 2018/05/08 12:20:47 utils.go:137: http: named cookie not present Failed to get/verify cookie "session"
+WARNING 2018/05/08 15:54:25 utils.go:137: http: named cookie not present Failed to get/verify cookie "session"
+WARNING 2018/05/08 16:08:45 utils.go:139: http: named cookie not present Failed to get/verify cookie "session"

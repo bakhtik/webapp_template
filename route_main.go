@@ -1,6 +1,10 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/bakhtik/webapp_template/data"
+)
 
 func index(w http.ResponseWriter, req *http.Request) {
 	if sess, err := session(w, req); err != nil {
@@ -11,7 +15,10 @@ func index(w http.ResponseWriter, req *http.Request) {
 			logger.SetPrefix("ERROR ")
 			logger.Println(err, "Cannot fetch user")
 		}
-		generateHTML(w, user, "layout", "private.navbar", "index")
+		data := struct {
+			data.User
+		}{user}
+		generateHTML(w, data, "layout", "private.navbar", "index")
 	}
 }
 
@@ -22,6 +29,18 @@ func admin(w http.ResponseWriter, req *http.Request) {
 		logger.SetPrefix("ERROR ")
 		logger.Println(err, "Cannot fetch user")
 	}
-	generateHTML(w, user, "layout", "private.navbar", "admin")
+	users, err := data.Users()
+	if err != nil {
+		logger.SetPrefix("ERROR ")
+		logger.Println(err, "Cannot fetch users")
+	}
+	data := struct {
+		data.User
+		Users []data.User
+	}{
+		user,
+		users,
+	}
+	generateHTML(w, data, "layout", "private.navbar", "admin")
 
 }

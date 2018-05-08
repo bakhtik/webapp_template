@@ -117,7 +117,10 @@ func profile(w http.ResponseWriter, req *http.Request) {
 		logger.SetPrefix("ERROR ")
 		logger.Println(err, "Cannot fetch user")
 	}
-	generateHTML(w, user, "layout", "private.navbar", "profile")
+	data := struct {
+		data.User
+	}{user}
+	generateHTML(w, data, "layout", "private.navbar", "profile")
 }
 
 // POST /change_account

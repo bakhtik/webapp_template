@@ -2,8 +2,8 @@
 <div class="navbar">
   <ul>
     <li><a href="/">Home</a></li>
-    {{ if . }}
-      {{ if eq .Role "admin" }}
+    {{ if $u := .User }}
+      {{ if eq $u.Role "admin" }}
       <li><a href="/admin">Admin</a></li>
       {{ end }}
     {{ end }}

@@ -25,6 +25,8 @@ type Configuration struct {
 var config Configuration
 var logger *log.Logger
 
+const timeFMT = "02/Jan/2006:15:04:05 -0700"
+
 func init() {
 	loadConfig()
 	file, err := os.OpenFile("webapp.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
@@ -104,7 +106,7 @@ func loggingHandler(writer io.Writer, next http.Handler) http.Handler {
 			}
 		}
 
-		fmt.Fprintf(writer, "%s - %s [%v] \"%s %s %s\" %d %d\n", host, username, time.Now().Format("02/Jan/2006:15:04:05 -0700"), req.Method, req.RequestURI, req.Proto, resp.StatusCode, len(body))
+		fmt.Fprintf(writer, "%s - %s [%v] \"%s %s %s\" %d %d\n", host, username, time.Now().Format(timeFMT), req.Method, req.RequestURI, req.Proto, resp.StatusCode, len(body))
 	})
 }
 
