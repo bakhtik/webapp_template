@@ -104,35 +104,14 @@ func logout(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/", http.StatusSeeOther)
 }
 
-// for authorized access only to handlers
-func authenticated(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// check if authenticated
-		_, err := session(w, req)
-		if err != nil {
-			//http.Error(w, "not logged in", http.StatusUnauthorized)
-			logger.SetPrefix("WARNING ")
-			logger.Println(err, `Failed to get/verify cookie "session"`)
-			http.Redirect(w, req, "/", http.StatusSeeOther)
-			return // don't call original handler
-		}
-		next.ServeHTTP(w, req)
-	})
-}
-
-// permission check
-func authorized(next http.Handler, roles ...string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		sess, _ := session(w, req)
-		if roles != nil {
-			user, err := sess.User()
-			if !strSliceContains(roles, user.Role) {
-				logger.SetPrefix("WARNING ")
-				logger.Printf("%v: User %s has not permission for requested page", err, user.Name)
-				http.Error(w, "You must have admin rights to enter the page", http.StatusForbidden)
-				return
-			}
-		}
-		next.ServeHTTP(w, req)
-	})
+// GET /profile
+// Show the profile page
+func profile(w http.ResponseWriter, req *http.Request) {
+	sess, _ := session(w, req)
+	user, err := sess.User()
+	if err != nil {
+		logger.SetPrefix("ERROR ")
+		logger.Println(err, "Cannot fetch user")
+	}
+	generateHTML(w, user, "layout", "private.navbar", "profile")
 }

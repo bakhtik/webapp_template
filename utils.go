@@ -108,6 +108,9 @@ func loggingHandler(writer io.Writer, next http.Handler) http.Handler {
 	})
 }
 
+// logged handler changes behaviour depending on configuration file
+// if none logfile provided no logging occured
+// if "stdout" - logging to console else to provied filename
 func logged(h http.Handler) http.Handler {
 	switch config.LogFile {
 	case "":
@@ -121,4 +124,37 @@ func logged(h http.Handler) http.Handler {
 		}
 		return loggingHandler(logFile, h)
 	}
+}
+
+// for authorized access only to handlers
+func authenticated(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		// check if authenticated
+		_, err := session(w, req)
+		if err != nil {
+			//http.Error(w, "not logged in", http.StatusUnauthorized)
+			logger.SetPrefix("WARNING ")
+			logger.Println(err, `Failed to get/verify cookie "session"`)
+			http.Redirect(w, req, "/", http.StatusSeeOther)
+			return // don't call original handler
+		}
+		next.ServeHTTP(w, req)
+	})
+}
+
+// permission check
+func authorized(next http.Handler, roles ...string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		sess, _ := session(w, req)
+		if roles != nil {
+			user, err := sess.User()
+			if !strSliceContains(roles, user.Role) {
+				logger.SetPrefix("WARNING ")
+				logger.Printf("%v: User %s has not permission for requested page", err, user.Name)
+				http.Error(w, "You must have admin rights to enter the page", http.StatusForbidden)
+				return
+			}
+		}
+		next.ServeHTTP(w, req)
+	})
 }

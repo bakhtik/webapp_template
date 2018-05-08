@@ -1,0 +1,15 @@
+{{ define "content" }}
+
+{{ if . }}
+<form action="change_account" method="post">
+  <p>User Profile</p>
+  <input type="text" name="name" placeholder="Name" value="{{ .Name }}" readonly>
+  <input type="email" name="email" placeholder="Email address" value="{{ .Email }}" readonly>
+  <input type="password" name="old_password" placeholder="Old password" required autofocus>
+  <input type="password" name="new_password" placeholder="New password" required>
+  <input type="password" name="confirm_password" placeholder="Confirm new password" required>
+  <button type="submit">Save</button>
+</form>
+{{ end }}
+
+{{ end }}
